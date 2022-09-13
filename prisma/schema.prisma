@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  adm      Boolean  @default(false)
+  email    String   @unique
+  name     String   @unique
+  password String
+  forms    Form[]
+  answers  Answer[]
+
+  @@map("users")
+}
+
+model Form {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  createdBy Int
+  date      DateTime
+  token     String
+  questions Question[]
+  answers   Answer[]
+  value     Float
+
+  user User @relation(fields: [createdBy], references: [id])
+
+  @@map("forms")
+}
+
+model Question {
+  id             Int     @id @default(autoincrement())
+  formId         Int
+  type           String
+  title          String
+  inputs         Input[]
+  value          Float
+  correct_answer String
+
+  form Form @relation(fields: [formId], references: [id])
+
+  @@map("questions")
+}
+
+model Answer {
+  id        Int    @id @default(autoincrement())
+  createdBy Int
+  formId    Int
+  content   String
+
+  user User @relation(fields: [createdBy], references: [id])
+  form Form @relation(fields: [formId], references: [id])
+
+  @@map("answers")
+}
+
+model Input {
+  id         Int    @id @default(autoincrement())
+  value      String
+  questionId Int
+
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@map("inputs")
+}

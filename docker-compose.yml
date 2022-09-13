@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  form-db:
+    image: postgres:13
+    container_name: form-db
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: adm
+      POSTGRES_PASSWORD: adm
+      POSTGRES_DB: form
+    networks:
+      - back
+networks:
+  back:
