@@ -17,7 +17,7 @@ model User {
 
   adm      Boolean  @default(false)
   email    String   @unique
-  name     String   @unique
+  name     String
   password String
   forms    Form[]
   answers  Answer[]

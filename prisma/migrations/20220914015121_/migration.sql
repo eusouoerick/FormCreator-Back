@@ -1,38 +1,15 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "users" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updateAt" TIMESTAMP(3) NOT NULL,
+    "adm" BOOLEAN NOT NULL DEFAULT false,
+    "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
 
-  - You are about to drop the `Answer` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Form` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Input` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Question` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "Answer" DROP CONSTRAINT "Answer_createdBy_fkey";
-
--- DropForeignKey
-ALTER TABLE "Answer" DROP CONSTRAINT "Answer_formId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Form" DROP CONSTRAINT "Form_createdBy_fkey";
-
--- DropForeignKey
-ALTER TABLE "Input" DROP CONSTRAINT "Input_questionId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Question" DROP CONSTRAINT "Question_formId_fkey";
-
--- DropTable
-DROP TABLE "Answer";
-
--- DropTable
-DROP TABLE "Form";
-
--- DropTable
-DROP TABLE "Input";
-
--- DropTable
-DROP TABLE "Question";
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "forms" (
@@ -42,6 +19,7 @@ CREATE TABLE "forms" (
     "createdBy" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "token" TEXT NOT NULL,
+    "value" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "forms_pkey" PRIMARY KEY ("id")
 );
@@ -76,6 +54,9 @@ CREATE TABLE "inputs" (
 
     CONSTRAINT "inputs_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- AddForeignKey
 ALTER TABLE "forms" ADD CONSTRAINT "forms_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
