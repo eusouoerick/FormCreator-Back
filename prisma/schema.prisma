@@ -37,7 +37,7 @@ model Form {
   answers   Answer[]
   value     Float
 
-  user User @relation(fields: [createdBy], references: [id])
+  user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
   @@map("forms")
 }
@@ -51,7 +51,7 @@ model Question {
   value          Float
   correct_answer String
 
-  form Form @relation(fields: [formId], references: [id])
+  form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@map("questions")
 }
@@ -62,8 +62,8 @@ model Answer {
   formId    Int
   content   String
 
-  user User @relation(fields: [createdBy], references: [id])
-  form Form @relation(fields: [formId], references: [id])
+  user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@map("answers")
 }
@@ -73,7 +73,7 @@ model Input {
   value      String
   questionId Int
 
-  question Question @relation(fields: [questionId], references: [id])
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@map("inputs")
 }
