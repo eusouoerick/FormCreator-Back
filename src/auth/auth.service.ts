@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import {
   ForbiddenException,
   Injectable,
@@ -54,7 +55,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
+          throw new BadRequestException('Credentials taken');
         }
       }
       throw error;

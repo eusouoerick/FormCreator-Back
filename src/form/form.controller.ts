@@ -1,11 +1,16 @@
-import { UseGuards } from '@nestjs/common';
+import { Body, UseGuards } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { Controller, Get, Patch, Delete } from '@nestjs/common';
+import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
+import { FormDto } from './dto';
+import { FormService } from './form.service';
 
 @UseGuards(JwtGuard)
 @Controller('forms')
-export class FormsController {
+export class FormController {
+  constructor(private formService: FormService) {}
+
   @Get()
   getForms() {
     // only adm
@@ -13,8 +18,8 @@ export class FormsController {
   }
 
   @Post()
-  createForm() {
-    return 'create form';
+  createForm(@Body() dto: FormDto, @GetUser('id') userId: number) {
+    return this.formService.create(userId, dto);
   }
 
   @Get(':token')
