@@ -15,7 +15,7 @@ export class UserService {
       },
       include: {
         forms: true,
-        answers: true,
+        user_answers: true,
       },
     });
 
@@ -62,7 +62,7 @@ export class UserService {
   }
 
   async findAnswersByUser(userId: number) {
-    const answers = await this.prisma.answer.findMany({
+    const answers = await this.prisma.user_Answer.findMany({
       where: {
         createdBy: userId,
       },
@@ -71,7 +71,7 @@ export class UserService {
   }
 
   async findUserAnswerById(userId: number, answerId: number) {
-    const answer = await this.prisma.answer.findMany({
+    const answer = await this.prisma.user_Answer.findMany({
       where: {
         createdBy: userId,
         id: answerId,
