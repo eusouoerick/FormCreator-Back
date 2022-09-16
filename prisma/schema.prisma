@@ -15,12 +15,12 @@ model User {
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
-  adm      Boolean  @default(false)
-  email    String   @unique
-  name     String
-  password String
-  forms    Form[]
-  answers  Answer[]
+  adm          Boolean       @default(false)
+  email        String        @unique
+  name         String
+  password     String
+  forms        Form[]
+  user_answers User_Answer[]
 
   @@map("users")
 }
@@ -30,12 +30,15 @@ model Form {
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
-  createdBy Int
-  date      DateTime
-  token     String
-  questions Question[]
-  answers   Answer[]
-  value     Float
+  title            String
+  createdBy        Int
+  date             DateTime?
+  token            String?
+  answers_length   Int?          @default(0)
+  questions_length Int?          @default(0)
+  questions        Question[]
+  users_answers    User_Answer[]
+  value            Float?        @default(0)
 
   user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
@@ -43,37 +46,45 @@ model Form {
 }
 
 model Question {
-  id             Int     @id @default(autoincrement())
-  formId         Int
-  type           String
-  title          String
-  inputs         Input[]
-  value          Float
-  correct_answer String
+  id      Int      @id @default(autoincrement())
+  formId  Int
+  type    String
+  title   String
+  inputs  String[]
+  value   Float
+  answers Answer[]
 
   form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@map("questions")
 }
 
-model Answer {
-  id        Int    @id @default(autoincrement())
+model User_Answer {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
   createdBy Int
   formId    Int
-  content   String
+  answers   Answer[]
 
   user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
 
-  @@map("answers")
+  @@map("users_answers")
 }
 
-model Input {
-  id         Int    @id @default(autoincrement())
-  value      String
-  questionId Int
+model Answer {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
 
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user_answerId Int
+  questionId    Int
+  content       String
+  isCorrect     Boolean?
 
-  @@map("inputs")
+  answerId User_Answer @relation(fields: [user_answerId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("answers")
 }

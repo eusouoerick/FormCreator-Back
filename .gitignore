@@ -3,6 +3,7 @@
 /node_modules
 
 docker*
+.example.ts
 
 *.env
 # Logs
