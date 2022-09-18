@@ -1,11 +1,11 @@
-import { Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { UserService } from './user.service';
-import { UserReq } from 'src/types';
 import { Body } from '@nestjs/common';
 import { EditUserDto } from './dto';
 import { Param } from '@nestjs/common';
+import { QueryType } from 'src/types';
 
 @UseGuards(JwtGuard)
 @Controller('users')
@@ -13,29 +13,29 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  async getUser(@GetUser() user: UserReq) {
-    const data = await this.userService.findUser(user);
+  async getUser(@GetUser('id') userId: number, @Query() query: QueryType) {
+    const data = await this.userService.findUser(userId, query);
     return { user: data };
   }
 
   @Patch()
-  async editUser(@GetUser() user: UserReq, @Body() dto: EditUserDto) {
-    const data = await this.userService.findUserAndUpdate(user, dto);
+  async editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
+    const data = await this.userService.findUserAndUpdate(userId, dto);
     return { user: data };
   }
 
   @Get('forms')
-  getForms(@GetUser() user: UserReq) {
-    return this.userService.findFormsByUser(user.id);
+  getForms(@GetUser('id') userId: number, @Query() query: QueryType) {
+    return this.userService.findFormsByUser(userId, query);
   }
 
   @Get('answers')
-  getAnswers(@GetUser() user: UserReq) {
-    return this.userService.findAnswersByUser(user.id);
+  getAnswers(@GetUser('id') userId: number) {
+    return this.userService.findAnswersByUser(userId);
   }
 
   @Get('answers/:id')
-  getAnswerById(@GetUser() user: UserReq, @Param('id') answerId: number) {
-    return this.userService.findUserAnswerById(user.id, +answerId);
+  getAnswerById(@GetUser('id') userId: number, @Param('id') answerId: number) {
+    return this.userService.findUserAnswerById(userId, +answerId);
   }
 }

@@ -1,21 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as argon from 'argon2';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserReq } from 'src/types';
+import { QueryType } from 'src/types';
 import { EditUserDto } from './dto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findUser(userReq: UserReq) {
+  async findUser(userId: number, query: QueryType) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id: userReq.id,
+        id: userId,
       },
       include: {
-        forms: true,
-        user_answers: true,
+        forms: query.forms ? true : false,
+        user_answers: query.answers ? { include: { answers: true } } : false,
       },
     });
 
@@ -25,10 +29,10 @@ export class UserService {
     return user;
   }
 
-  async findUserAndUpdate(userReq: UserReq, dto: EditUserDto) {
+  async findUserAndUpdate(userId: number, dto: EditUserDto) {
     const cehckUser = await this.prisma.user.findUnique({
       where: {
-        id: userReq.id,
+        id: userId,
       },
     });
 
@@ -40,7 +44,7 @@ export class UserService {
 
     return await this.prisma.user.update({
       where: {
-        id: userReq.id,
+        id: userId,
       },
       data: {
         ...dto,
@@ -52,13 +56,17 @@ export class UserService {
     });
   }
 
-  async findFormsByUser(userId: number) {
+  async findFormsByUser(userId: number, query) {
     const forms = await this.prisma.form.findMany({
       where: {
         createdBy: userId,
       },
+      include: {
+        questions: query.questions ? true : false,
+        users_answers: query.answers ? { include: { answers: true } } : false,
+      },
     });
-    return { forms };
+    return { forms: [...forms] };
   }
 
   async findAnswersByUser(userId: number) {
@@ -66,18 +74,26 @@ export class UserService {
       where: {
         createdBy: userId,
       },
+      include: {
+        answers: true,
+      },
     });
     return { answers };
   }
 
   async findUserAnswerById(userId: number, answerId: number) {
-    const answer = await this.prisma.user_Answer.findMany({
+    const answer = await this.prisma.user_Answer.findUnique({
       where: {
-        createdBy: userId,
         id: answerId,
       },
-    })[0];
+      include: {
+        answers: true,
+      },
+    });
     if (!answer) throw new NotFoundException('Answer not found');
-    return { answer };
+    if (answer.createdBy !== userId) {
+      throw new ForbiddenException('User not authorized');
+    }
+    return answer;
   }
 }
