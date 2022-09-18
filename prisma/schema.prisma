@@ -33,7 +33,7 @@ model Form {
   title            String
   createdBy        Int
   date             DateTime?
-  token            String?
+  hash             String?       @unique
   answers_length   Int?          @default(0)
   questions_length Int?          @default(0)
   questions        Question[]
@@ -81,7 +81,7 @@ model Answer {
   user_answerId Int
   questionId    Int
   content       String
-  isCorrect     Boolean?
+  isCorrect     Boolean? @default(false)
 
   answerId User_Answer @relation(fields: [user_answerId], references: [id], onDelete: Cascade)
   question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
