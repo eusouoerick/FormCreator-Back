@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import {
   IsString,
   IsNumber,
@@ -8,6 +7,7 @@ import {
   ValidateNested,
   IsOptional,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { QuestionDto } from './question.dto';
 
 export class FormDto {
@@ -25,8 +25,4 @@ export class FormDto {
   @ValidateNested({ each: true })
   @Type(() => QuestionDto)
   questions: QuestionDto[];
-
-  @IsNotEmpty()
-  @IsNumber()
-  value: number;
 }

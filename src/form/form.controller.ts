@@ -1,9 +1,11 @@
-import { Body, UseGuards } from '@nestjs/common';
+import { Body, Param, Query, UseGuards } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { Controller, Get, Patch, Delete } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
-import { FormDto } from './dto';
+import { QueryType } from 'src/types';
+import { EditFormDto, FormDto } from './dto';
+import { AnswerDto } from './dto/answer.dto';
 import { FormService } from './form.service';
 
 @UseGuards(JwtGuard)
@@ -22,28 +24,40 @@ export class FormController {
     return this.formService.create(userId, dto);
   }
 
-  @Get(':token')
-  getFormById() {
-    return 'get form by id';
+  @Get(':hash')
+  getFormByhash(
+    @Param('hash') hash: string,
+    @Query() query: QueryType,
+    @GetUser('id') userId: number,
+  ) {
+    return this.formService.getFormByHash(hash, query, userId);
   }
 
-  @Patch(':token')
-  editFormById() {
-    return 'edit form by id';
+  @Patch(':hash')
+  editFormByhash(
+    @Param(':hash') hash: string,
+    @Body() dto: EditFormDto,
+    @GetUser('id') userId: number,
+  ) {
+    return this.formService.updateForm(hash, dto, userId);
   }
 
-  @Delete(':token')
-  deleteFormById() {
-    return 'delete form by id';
+  @Delete(':hash')
+  deleteFormById(@Param(':hash') hash: string, @GetUser('id') userId: number) {
+    return this.formService.deleteForm(hash, userId);
   }
 
-  @Get(':token/answers')
-  getAnswers() {
-    return 'get answers';
+  @Get(':hash/answers')
+  getAnswers(@Param(':hash') hash: string, @GetUser('id') userId: number) {
+    return this.formService.getAnswers(hash, userId);
   }
 
-  @Post(':token/answers')
-  createAnswers() {
-    return 'create answers';
+  @Post(':hash/answers')
+  createAnswers(
+    @Param(':hash') hash: string,
+    @Body() dto: AnswerDto,
+    @GetUser('id') userId: number,
+  ) {
+    return this.formService.createAnswer(hash, dto, userId);
   }
 }
