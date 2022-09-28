@@ -79,18 +79,33 @@ export class FormService {
           hash,
         },
         include: {
-          questions: true,
-          users_answers: true,
+          questions: !!query.questions,
+          users_answers: {
+            include: {
+              author: {
+                select: {
+                  name: true,
+                  email: true,
+                },
+              },
+              answers: true,
+            },
+          },
         },
       });
 
-      if (!query.questions) delete form.questions;
+      let userBlocked = false;
+      if (form.createdBy !== userId) {
+        userBlocked = form.users_answers.some(
+          (item) => item.createdBy === userId,
+        );
+      }
 
       if (!query.answers || (query.answers && form.createdBy !== userId)) {
         delete form.users_answers;
       }
 
-      return form;
+      return { userBlocked, ...form };
       //
     } catch (error) {
       throw new NotFoundException(error.message || 'Form not found');
@@ -149,8 +164,16 @@ export class FormService {
         id: true,
         createdBy: true,
         answers_length: true,
+        questions_length: true,
+        value: true,
         users_answers: {
           include: {
+            author: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
             answers: true,
           },
         },
@@ -169,17 +192,13 @@ export class FormService {
 
   async createAnswer(hash: string, dto: AnswerDto, userId: number) {
     const form = await this.prisma.form.findFirst({
-      where: {
-        hash,
-      },
+      where: { hash },
     });
 
     if (!form) throw new NotFoundException('Form not found');
 
     const checkUser = await this.prisma.user_Answer.findFirst({
-      where: {
-        createdBy: userId,
-      },
+      where: { createdBy: userId },
     });
 
     if (checkUser) {
@@ -192,6 +211,7 @@ export class FormService {
       data: {
         createdBy: userId,
         formId: form.id,
+        value: 0,
       },
     });
 

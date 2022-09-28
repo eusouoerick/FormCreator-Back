@@ -1,6 +1,5 @@
 import {
   IsString,
-  IsNumber,
   IsArray,
   ArrayNotEmpty,
   IsNotEmpty,
@@ -14,6 +13,10 @@ export class FormDto {
   @IsNotEmpty()
   @IsString()
   title: string;
+
+  @IsOptional()
+  @IsString()
+  desc: string;
 
   @IsOptional()
   @IsString()
