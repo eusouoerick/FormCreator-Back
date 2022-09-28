@@ -31,6 +31,7 @@ model Form {
   updateAt  DateTime @updatedAt
 
   title            String
+  desc             String?
   createdBy        Int
   date             DateTime?
   hash             String?       @unique
@@ -40,7 +41,7 @@ model Form {
   users_answers    User_Answer[]
   value            Float?        @default(0)
 
-  user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  author User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
   @@map("forms")
 }
@@ -66,9 +67,10 @@ model User_Answer {
 
   createdBy Int
   formId    Int
+  value     Int?
   answers   Answer[]
 
-  user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  author User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@map("users_answers")
