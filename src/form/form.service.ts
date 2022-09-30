@@ -21,6 +21,7 @@ export class FormService {
           createdBy: userId,
           title: dto.title,
           date: dto.date || null,
+          average: dto.average || null,
         },
       });
 
@@ -33,11 +34,10 @@ export class FormService {
           (!question.inputs || !question.inputs.length)
         ) {
           throw new Error(
-            'Question error -  "select" type question must have inputs',
+            'Question error - "select" type question must have inputs',
           );
         }
 
-        // passa o id do formulário
         return { formId: form.id, ...question };
       });
 
@@ -211,7 +211,6 @@ export class FormService {
       data: {
         createdBy: userId,
         formId: form.id,
-        value: 0,
       },
     });
 

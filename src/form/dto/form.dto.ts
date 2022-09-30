@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   ValidateNested,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { QuestionDto } from './question.dto';
@@ -21,6 +22,10 @@ export class FormDto {
   @IsOptional()
   @IsString()
   date: Date;
+
+  @IsOptional()
+  @IsNumber()
+  average: number;
 
   @IsNotEmpty()
   @IsArray()
