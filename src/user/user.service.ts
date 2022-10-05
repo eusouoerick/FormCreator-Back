@@ -81,7 +81,7 @@ export class UserService {
     return { answers };
   }
 
-  async findUserAnswerById(userId: number, answerId: number) {
+  async findUserAnswerById(userId: number, answerId: string) {
     const answer = await this.prisma.user_Answer.findUnique({
       where: {
         id: answerId,

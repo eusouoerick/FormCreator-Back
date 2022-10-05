@@ -5,16 +5,15 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { EditFormDto, FormDto } from './dto';
 import { QueryType } from 'src/types';
-import { AnswerDto } from './dto/answer.dto';
+import { EditFormDto, FormDto } from './dto';
 
 @Injectable()
 export class FormService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: number, dto: FormDto) {
-    let formId: number;
+    let formId: string;
     try {
       const form = await this.prisma.form.create({
         data: {
@@ -67,49 +66,45 @@ export class FormService {
       if (formId) {
         await this.prisma.form.delete({ where: { id: formId } });
       }
-
       throw new BadRequestException(error.message);
     }
   }
 
   async getFormByHash(hash: string, query: QueryType, userId: number) {
-    try {
-      const form = await this.prisma.form.findUniqueOrThrow({
-        where: {
-          hash,
-        },
-        include: {
-          questions: !!query.questions,
-          users_answers: {
-            include: {
-              author: {
-                select: {
-                  name: true,
-                  email: true,
-                },
+    const form = await this.prisma.form.findUnique({
+      where: {
+        hash,
+      },
+      include: {
+        questions: !!query.questions,
+        users_answers: {
+          include: {
+            author: {
+              select: {
+                name: true,
+                email: true,
               },
-              answers: true,
             },
+            answers: true,
           },
         },
-      });
+      },
+    });
 
-      let userBlocked = false;
-      if (form.createdBy !== userId) {
-        userBlocked = form.users_answers.some(
-          (item) => item.createdBy === userId,
-        );
-      }
+    if (!form) throw new NotFoundException('Form not found');
 
-      if (!query.answers || (query.answers && form.createdBy !== userId)) {
-        delete form.users_answers;
-      }
-
-      return { userBlocked, ...form };
-      //
-    } catch (error) {
-      throw new NotFoundException(error.message || 'Form not found');
+    let userBlocked = false;
+    if (form.createdBy !== userId) {
+      userBlocked = form.users_answers.some(
+        (item) => item.createdBy === userId,
+      );
     }
+
+    if (!query.answers || (query.answers && form.createdBy !== userId)) {
+      delete form.users_answers;
+    }
+
+    return { userBlocked, ...form };
   }
 
   async updateForm(hash: string, dto: EditFormDto, userId: number) {
@@ -153,86 +148,5 @@ export class FormService {
     });
 
     return { formId: form.id, success: true };
-  }
-
-  async getAnswers(hash: string, userId: number) {
-    const form = await this.prisma.form.findFirst({
-      where: {
-        hash,
-      },
-      select: {
-        id: true,
-        createdBy: true,
-        answers_length: true,
-        questions_length: true,
-        value: true,
-        users_answers: {
-          include: {
-            author: {
-              select: {
-                name: true,
-                email: true,
-              },
-            },
-            answers: true,
-          },
-        },
-      },
-    });
-
-    if (!form) throw new NotFoundException('Form not found');
-
-    if (form.createdBy !== userId) {
-      throw new ForbiddenException('User not authorized');
-    }
-
-    delete form.createdBy;
-    return form;
-  }
-
-  async createAnswer(hash: string, dto: AnswerDto, userId: number) {
-    const form = await this.prisma.form.findFirst({
-      where: { hash },
-    });
-
-    if (!form) throw new NotFoundException('Form not found');
-
-    const checkUser = await this.prisma.user_Answer.findFirst({
-      where: { createdBy: userId },
-    });
-
-    if (checkUser) {
-      throw new ForbiddenException(
-        'The user has already responded to the form',
-      );
-    }
-
-    const { id: answerId } = await this.prisma.user_Answer.create({
-      data: {
-        createdBy: userId,
-        formId: form.id,
-      },
-    });
-
-    const data = dto.answers.map((item) => ({
-      user_answerId: answerId,
-      ...item,
-    }));
-
-    const { count } = await this.prisma.answer.createMany({
-      data,
-    });
-
-    await this.prisma.form.update({
-      where: { id: form.id },
-      data: { answers_length: { increment: 1 } },
-    });
-
-    return {
-      formId: form.id,
-      answerId,
-      count,
-      success: true,
-    };
   }
 }

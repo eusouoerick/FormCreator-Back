@@ -2,27 +2,35 @@ import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
+  IsBoolean,
   IsNotEmpty,
-  IsNumber,
   IsString,
   ValidateNested,
 } from 'class-validator';
 
-export class AnswerDto {
+export class CheckAnswersDto {
+  @IsNotEmpty()
+  @IsString()
+  user_answerId: string;
+
   @IsNotEmpty()
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => Answer)
-  answers: Answer[];
+  @Type(() => answerToCheck)
+  answers: answerToCheck[];
 }
 
-export class Answer {
+class answerToCheck {
   @IsNotEmpty()
-  @IsNumber()
-  questionId: number;
+  @IsString()
+  id: string;
 
   @IsNotEmpty()
   @IsString()
-  content: string;
+  questionId: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  isCorrect: boolean;
 }

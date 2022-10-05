@@ -26,7 +26,7 @@ model User {
 }
 
 model Form {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
@@ -36,8 +36,9 @@ model Form {
   average          Int?
   date             DateTime?
   hash             String?       @unique
-  answers_length   Int?          @default(0)
-  questions_length Int?          @default(0)
+  answers_length   Int           @default(0)
+  questions_length Int           @default(0)
+  corrected_length Int           @default(0)
   questions        Question[]
   users_answers    User_Answer[]
   value            Float?        @default(0)
@@ -48,8 +49,8 @@ model Form {
 }
 
 model Question {
-  id      Int      @id @default(autoincrement())
-  formId  Int
+  id      String   @id @default(uuid())
+  formId  String
   type    String
   title   String
   inputs  String[]
@@ -62,12 +63,12 @@ model Question {
 }
 
 model User_Answer {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
   createdBy Int
-  formId    Int
+  formId    String
   value     Int?
   answers   Answer[]
 
@@ -78,11 +79,11 @@ model User_Answer {
 }
 
 model Answer {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
-  user_answerId Int
-  questionId    Int
+  user_answerId String
+  questionId    String
   content       String
   isCorrect     Boolean?
 

@@ -35,7 +35,7 @@ export class UserController {
   }
 
   @Get('answers/:id')
-  getAnswerById(@GetUser('id') userId: number, @Param('id') answerId: number) {
-    return this.userService.findUserAnswerById(userId, +answerId);
+  getAnswerById(@GetUser('id') userId: number, @Param('id') answerId: string) {
+    return this.userService.findUserAnswerById(userId, answerId);
   }
 }

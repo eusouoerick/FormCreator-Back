@@ -5,7 +5,6 @@ import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { QueryType } from 'src/types';
 import { EditFormDto, FormDto } from './dto';
-import { AnswerDto } from './dto/answer.dto';
 import { FormService } from './form.service';
 
 @UseGuards(JwtGuard)
@@ -35,7 +34,7 @@ export class FormController {
 
   @Patch(':hash')
   editFormByhash(
-    @Param(':hash') hash: string,
+    @Param('hash') hash: string,
     @Body() dto: EditFormDto,
     @GetUser('id') userId: number,
   ) {
@@ -43,21 +42,7 @@ export class FormController {
   }
 
   @Delete(':hash')
-  deleteFormById(@Param(':hash') hash: string, @GetUser('id') userId: number) {
+  deleteFormById(@Param('hash') hash: string, @GetUser('id') userId: number) {
     return this.formService.deleteForm(hash, userId);
-  }
-
-  @Get(':hash/answers')
-  getAnswers(@Param(':hash') hash: string, @GetUser('id') userId: number) {
-    return this.formService.getAnswers(hash, userId);
-  }
-
-  @Post(':hash/answers')
-  createAnswers(
-    @Param(':hash') hash: string,
-    @Body() dto: AnswerDto,
-    @GetUser('id') userId: number,
-  ) {
-    return this.formService.createAnswer(hash, dto, userId);
   }
 }

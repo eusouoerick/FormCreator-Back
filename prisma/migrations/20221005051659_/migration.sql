@@ -13,16 +13,18 @@ CREATE TABLE "users" (
 
 -- CreateTable
 CREATE TABLE "forms" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
     "title" TEXT NOT NULL,
     "desc" TEXT,
     "createdBy" INTEGER NOT NULL,
+    "average" INTEGER,
     "date" TIMESTAMP(3),
     "hash" TEXT,
-    "answers_length" INTEGER DEFAULT 0,
-    "questions_length" INTEGER DEFAULT 0,
+    "answers_length" INTEGER NOT NULL DEFAULT 0,
+    "questions_length" INTEGER NOT NULL DEFAULT 0,
+    "corrected_length" INTEGER NOT NULL DEFAULT 0,
     "value" DOUBLE PRECISION DEFAULT 0,
 
     CONSTRAINT "forms_pkey" PRIMARY KEY ("id")
@@ -30,8 +32,8 @@ CREATE TABLE "forms" (
 
 -- CreateTable
 CREATE TABLE "questions" (
-    "id" SERIAL NOT NULL,
-    "formId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "formId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "inputs" TEXT[],
@@ -42,11 +44,11 @@ CREATE TABLE "questions" (
 
 -- CreateTable
 CREATE TABLE "users_answers" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
     "createdBy" INTEGER NOT NULL,
-    "formId" INTEGER NOT NULL,
+    "formId" TEXT NOT NULL,
     "value" INTEGER,
 
     CONSTRAINT "users_answers_pkey" PRIMARY KEY ("id")
@@ -54,12 +56,12 @@ CREATE TABLE "users_answers" (
 
 -- CreateTable
 CREATE TABLE "answers" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "user_answerId" INTEGER NOT NULL,
-    "questionId" INTEGER NOT NULL,
+    "user_answerId" TEXT NOT NULL,
+    "questionId" TEXT NOT NULL,
     "content" TEXT NOT NULL,
-    "isCorrect" BOOLEAN DEFAULT false,
+    "isCorrect" BOOLEAN,
 
     CONSTRAINT "answers_pkey" PRIMARY KEY ("id")
 );
