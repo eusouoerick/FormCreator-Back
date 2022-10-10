@@ -15,17 +15,17 @@ import { QueryType } from 'src/types';
 import { EditFormDto, FormDto } from './dto';
 import { FormService } from './form.service';
 
-@UseGuards(JwtGuard)
 @Controller('forms')
 export class FormController {
   constructor(private formService: FormService) {}
 
-  @Get()
-  getForms() {
-    // only adm
-    return 'all forms';
-  }
+  // @Get()
+  // getForms() {
+  //   // only adm
+  //   return 'all forms';
+  // }
 
+  @UseGuards(JwtGuard)
   @Post()
   createForm(@Body() dto: FormDto, @GetUser('id') userId: number) {
     return this.formService.create(userId, dto);
@@ -40,6 +40,7 @@ export class FormController {
     return this.formService.getFormByHash(hash, query, userId);
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':hash')
   editFormByhash(
     @Param('hash') hash: string,
@@ -49,6 +50,7 @@ export class FormController {
     return this.formService.updateForm(hash, dto, userId);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':hash')
   deleteFormById(@Param('hash') hash: string, @GetUser('id') userId: number) {
     return this.formService.deleteForm(hash, userId);
