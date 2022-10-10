@@ -70,6 +70,8 @@ export class FormService {
   }
 
   async getFormByHash(hash: string, query: QueryType, userId: number) {
+    console.log(userId);
+
     const form = await this.prisma.form.findUnique({
       where: {
         hash,
