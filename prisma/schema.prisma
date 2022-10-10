@@ -54,7 +54,7 @@ model Question {
   type    String
   title   String
   inputs  String[]
-  value   Float
+  value   Float?
   answers Answer[]
 
   form Form @relation(fields: [formId], references: [id], onDelete: Cascade)

@@ -1,6 +1,14 @@
-import { Body, Param, Query, UseGuards } from '@nestjs/common';
-import { Post } from '@nestjs/common';
-import { Controller, Get, Patch, Delete } from '@nestjs/common';
+import {
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Controller,
+  Get,
+  Patch,
+  Delete,
+  Post,
+} from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { QueryType } from 'src/types';

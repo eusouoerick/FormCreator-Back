@@ -25,7 +25,6 @@ export class FormService {
       });
 
       formId = form.id;
-
       const addFormId = dto.questions.map((question) => {
         // bloqueia questões de selecionar sem as opções
         if (

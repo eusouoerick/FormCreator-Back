@@ -59,13 +59,20 @@ export class AnswerService {
   async createAnswer(hash: string, dto: AnswerDto, userId: number) {
     const form = await this.prisma.form.findFirst({
       where: { hash },
+      include: {
+        users_answers: {
+          select: {
+            createdBy: true,
+          },
+        },
+      },
     });
 
     if (!form) throw new NotFoundException('Form not found');
 
-    const checkUser = await this.prisma.user_Answer.findFirst({
-      where: { createdBy: userId },
-    });
+    const checkUser = form.users_answers.some(
+      (item) => item.createdBy === userId,
+    );
 
     if (checkUser) {
       throw new ForbiddenException(
