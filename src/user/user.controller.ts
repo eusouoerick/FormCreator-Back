@@ -14,14 +14,12 @@ export class UserController {
 
   @Get()
   async getUser(@GetUser('id') userId: number, @Query() query: QueryType) {
-    const data = await this.userService.findUser(userId, query);
-    return { user: data };
+    return await this.userService.findUser(userId, query);
   }
 
   @Patch()
   async editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
-    const data = await this.userService.findUserAndUpdate(userId, dto);
-    return { user: data };
+    return await this.userService.findUserAndUpdate(userId, dto);
   }
 
   @Get('forms')

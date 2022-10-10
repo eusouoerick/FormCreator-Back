@@ -66,7 +66,7 @@ export class UserService {
         users_answers: query.answers ? { include: { answers: true } } : false,
       },
     });
-    return { forms: [...forms] };
+    return { forms };
   }
 
   async findAnswersByUser(userId: number) {
