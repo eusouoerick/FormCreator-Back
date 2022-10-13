@@ -6,9 +6,11 @@ import {
   Patch,
   Post,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
+import { QueryType } from 'src/types';
 import { AnswerService } from './answer.service';
 import { AnswerDto, CheckAnswersDto } from './dto';
 
@@ -18,8 +20,12 @@ export class AnswerController {
   constructor(private answerService: AnswerService) {}
 
   @Get()
-  getAnswers(@Param('hash') hash: string, @GetUser('id') userId: number) {
-    return this.answerService.getAnswers(hash, userId);
+  getAnswers(
+    @Param('hash') hash: string,
+    @GetUser('id') userId: number,
+    @Query() query: QueryType,
+  ) {
+    return this.answerService.getAnswers(hash, userId, query);
   }
 
   @Post()

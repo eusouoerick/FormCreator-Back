@@ -56,8 +56,8 @@ export class UserService {
     });
   }
 
-  async findFormsByUser(userId: number, query) {
-    const forms = await this.prisma.form.findMany({
+  async findFormsByUser(userId: number, query: QueryType) {
+    let forms = await this.prisma.form.findMany({
       where: {
         createdBy: userId,
       },
@@ -66,11 +66,16 @@ export class UserService {
         users_answers: query.answers ? { include: { answers: true } } : false,
       },
     });
+
+    console.log(query);
+    const limit = query.limit;
+    const skip = ((+query.page || 1) - 1) * limit;
+    forms = forms.reverse().slice(skip).slice(0, limit);
     return { forms };
   }
 
-  async findAnswersByUser(userId: number) {
-    const answers = await this.prisma.user_Answer.findMany({
+  async findAnswersByUser(userId: number, query: QueryType) {
+    let answers = await this.prisma.user_Answer.findMany({
       where: {
         createdBy: userId,
       },
@@ -78,6 +83,9 @@ export class UserService {
         answers: true,
       },
     });
+    const limit = query.limit;
+    const skip = ((+query.page || 1) - 1) * limit;
+    answers = answers.reverse().slice(skip).slice(0, limit);
     return { answers };
   }
 

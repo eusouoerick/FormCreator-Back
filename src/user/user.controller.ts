@@ -28,8 +28,8 @@ export class UserController {
   }
 
   @Get('answers')
-  getAnswers(@GetUser('id') userId: number) {
-    return this.userService.findAnswersByUser(userId);
+  getAnswers(@GetUser('id') userId: number, @Query() query: QueryType) {
+    return this.userService.findAnswersByUser(userId, query);
   }
 
   @Get('answers/:id')

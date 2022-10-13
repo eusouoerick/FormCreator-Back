@@ -4,13 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { QueryType } from 'src/types';
 import { AnswerDto, CheckAnswersDto } from './dto';
 
 @Injectable()
 export class AnswerService {
   constructor(private prisma: PrismaService) {}
 
-  async getAnswers(hash: string, userId: number) {
+  async getAnswers(hash: string, userId: number, query: QueryType) {
     const form = await this.prisma.form.findFirst({
       where: {
         hash,
@@ -52,7 +53,12 @@ export class AnswerService {
       throw new ForbiddenException('User not authorized');
     }
 
-    delete form.createdBy;
+    const limit = query.limit;
+    const skip = ((+query.page || 1) - 1) * limit;
+    form.users_answers = form.users_answers
+      .reverse()
+      .slice(skip)
+      .slice(0, limit);
     return form;
   }
 
