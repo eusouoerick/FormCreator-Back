@@ -30,28 +30,49 @@ export class UserService {
   }
 
   async findUserAndUpdate(userId: number, dto: EditUserDto) {
-    const cehckUser = await this.prisma.user.findUnique({
+    const checkUser = await this.prisma.user.findUnique({
       where: {
         id: userId,
       },
     });
 
-    if (!cehckUser) throw new NotFoundException('User not found');
+    if (!checkUser) throw new NotFoundException('User not found');
 
-    if (dto.password) {
-      dto.password = await argon.hash(dto.password);
+    delete dto.image;
+
+    if (dto.currentPassword) {
+      const checkPass = await argon.verify(
+        checkUser.password,
+        dto.currentPassword,
+      );
+      if (checkPass) throw new ForbiddenException('Invalid credential');
+      delete dto.currentPassword;
+    }
+
+    const data = {};
+    for (const key in dto) {
+      if (key === 'newPassword') {
+        if (dto.newPassword) {
+          data['password'] = await argon.hash(dto.newPassword);
+        }
+        delete dto.newPassword;
+      } else if (dto[key]) {
+        data[key] = dto[key];
+      }
     }
 
     return await this.prisma.user.update({
       where: {
         id: userId,
       },
-      data: {
-        ...dto,
-      },
+      data,
       select: {
+        id: true,
         email: true,
         name: true,
+        adm: true,
+        createdAt: true,
+        updateAt: true,
       },
     });
   }
@@ -67,7 +88,6 @@ export class UserService {
       },
     });
 
-    console.log(query);
     const limit = query.limit;
     const skip = ((+query.page || 1) - 1) * limit;
     forms = forms.reverse().slice(skip).slice(0, limit);

@@ -1,4 +1,13 @@
-import { Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Query,
+  UseGuards,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { UserService } from './user.service';
@@ -18,7 +27,12 @@ export class UserController {
   }
 
   @Patch()
-  async editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
+  @UseInterceptors(FileInterceptor('image'))
+  async editUser(
+    @GetUser('id') userId: number,
+    @Body() dto: EditUserDto,
+    @UploadedFile() file: any,
+  ) {
     return await this.userService.findUserAndUpdate(userId, dto);
   }
 
