@@ -45,7 +45,7 @@ export class UserService {
         checkUser.password,
         dto.currentPassword,
       );
-      if (checkPass) throw new ForbiddenException('Invalid credential');
+      if (!checkPass) throw new ForbiddenException('Invalid credential');
       delete dto.currentPassword;
     }
 
@@ -57,7 +57,7 @@ export class UserService {
         }
         delete dto.newPassword;
       } else if (dto[key]) {
-        data[key] = dto[key];
+        data[key] = dto[key].split(' ').join(' ');
       }
     }
 
