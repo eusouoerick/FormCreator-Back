@@ -1,8 +1,9 @@
 import {
-  ForbiddenException,
   Injectable,
+  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { isAfter, isToday } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { QueryType } from 'src/types';
 import { AnswerDto, CheckAnswersDto } from './dto';
@@ -75,6 +76,14 @@ export class AnswerService {
     });
 
     if (!form) throw new NotFoundException('Form not found');
+
+    if (form.date) {
+      if (isAfter(new Date(), form.date) && !isToday(form.date)) {
+        throw new ForbiddenException(
+          'This form is no longer receiving responses',
+        );
+      }
+    }
 
     const checkUser = form.users_answers.some(
       (item) => item.createdBy === userId,

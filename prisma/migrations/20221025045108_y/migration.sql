@@ -37,7 +37,7 @@ CREATE TABLE "questions" (
     "type" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "inputs" TEXT[],
-    "value" DOUBLE PRECISION NOT NULL,
+    "value" DOUBLE PRECISION,
 
     CONSTRAINT "questions_pkey" PRIMARY KEY ("id")
 );

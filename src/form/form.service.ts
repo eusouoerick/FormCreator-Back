@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { isBefore, isToday } from 'date-fns';
 import { QueryType } from 'src/types';
 import { EditFormDto, FormDto } from './dto';
 
@@ -15,11 +16,22 @@ export class FormService {
   async create(userId: number, dto: FormDto) {
     let formId: string;
     try {
+      let date = null;
+      if (dto.date) {
+        const formDate = dto.date
+          .split(/(-|\/)/)
+          .filter((i) => !/(-|\/)/.test(i));
+        date = new Date(+formDate[0], +formDate[1] - 1, +formDate[2]);
+        if (isBefore(date, new Date()) && !isToday(date)) {
+          throw new Error('Invalid date');
+        }
+      }
+
       const form = await this.prisma.form.create({
         data: {
           createdBy: userId,
           title: dto.title,
-          date: dto.date || null,
+          date: date || null,
           average: dto.average || null,
         },
       });
@@ -31,9 +43,7 @@ export class FormService {
           question.type === 'select' &&
           (!question.inputs || !question.inputs.length)
         ) {
-          throw new Error(
-            'Question error - "select" type question must have inputs',
-          );
+          throw new Error('"select" type question must have inputs');
         }
 
         return { formId: form.id, ...question };
@@ -70,7 +80,6 @@ export class FormService {
   }
 
   async getFormByHash(hash: string, query: QueryType, userId: number) {
-
     const form = await this.prisma.form.findUnique({
       where: {
         hash,

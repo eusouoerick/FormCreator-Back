@@ -6,6 +6,7 @@ import {
   ValidateNested,
   IsOptional,
   IsNumber,
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { QuestionDto } from './question.dto';
@@ -20,8 +21,8 @@ export class FormDto {
   desc: string;
 
   @IsOptional()
-  @IsString()
-  date: Date;
+  @Matches(/\d{4}(-|\/)\d{2}(-|\/)\d{2}/)
+  date: string;
 
   @IsOptional()
   @IsNumber()
