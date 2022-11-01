@@ -8,6 +8,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { QueryType } from 'src/types';
@@ -29,12 +30,12 @@ export class AnswerController {
   }
 
   @Post()
-  createAnswers(
+  createAnswer(
     @Param('hash') hash: string,
     @Body() dto: AnswerDto,
-    @GetUser('id') userId: number,
+    @GetUser() user: User,
   ) {
-    return this.answerService.createAnswer(hash, dto, userId);
+    return this.answerService.createAnswer(hash, dto, user);
   }
 
   @Patch()

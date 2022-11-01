@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { FormModule } from './form/form.module';
 import { AnswerModule } from './answer/answer.module';
 import * as Joi from 'joi';
+import { BullModule } from '@nestjs/bull';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -14,15 +16,27 @@ import * as Joi from 'joi';
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
-        // REDIS_HOST: Joi.string().required(),
-        // REDIS_PORT: Joi.number().required(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
+        CLIENT_URL: Joi.string(),
       }),
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: Number(configService.get('REDIS_PORT')),
+        },
+      }),
+      inject: [ConfigService],
     }),
     AuthModule,
     PrismaModule,
     FormModule,
     UserModule,
     AnswerModule,
+    EmailModule,
   ],
 })
 export class AppModule {}

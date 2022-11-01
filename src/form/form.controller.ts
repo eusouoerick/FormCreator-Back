@@ -19,12 +19,6 @@ import { FormService } from './form.service';
 export class FormController {
   constructor(private formService: FormService) {}
 
-  // @Get()
-  // getForms() {
-  //   // only adm
-  //   return 'all forms';
-  // }
-
   @UseGuards(JwtGuard)
   @Post()
   createForm(@Body() dto: FormDto, @GetUser('id') userId: number) {

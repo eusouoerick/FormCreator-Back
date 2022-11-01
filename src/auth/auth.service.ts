@@ -1,22 +1,20 @@
+// prettier-ignore
+import { ForbiddenException, Injectable, NotFoundException, } from '@nestjs/common';
 import { BadRequestException } from '@nestjs/common';
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as argon from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
-import { SigninDto, SignupDto } from './dto';
+// prettier-ignore
+import { ChangePasswordDto, ForgotPasswordDto, SigninDto, SignupDto } from './dto';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private emailService: EmailService,
     private jwt: JwtService,
     private prisma: PrismaService,
-    private config: ConfigService,
   ) {}
 
   async signin(dto: SigninDto) {
@@ -51,6 +49,7 @@ export class AuthService {
       });
 
       const token = await this.createToken(user.id);
+      await this.emailService.welcome({ email: user.email, name: user.name });
       return { token };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -62,9 +61,41 @@ export class AuthService {
     }
   }
 
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user) return;
+    console.log(user);
+    const { id, name, email } = user;
+    const token = await this.jwt.signAsync(
+      { userId: id },
+      { secret: process.env.JWT_SECRET, expiresIn: '1h' },
+    );
+    await this.emailService.forgotPassword({ name, email, token });
+    return;
+  }
+
+  async changePassword(token: string, dto: ChangePasswordDto) {
+    try {
+      const { userId } = this.jwt.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      const password = await argon.hash(dto.password);
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { password },
+      });
+      return { statusCode: 202, message: 'Success' };
+    } catch (error) {
+      throw new BadRequestException('Something went wrong... Try again');
+    }
+  }
+
   async createToken(userId: number) {
-    const payload = { sub: userId };
-    const secret = this.config.get('JWT_SECRET');
+    const payload = { userId: userId };
+    const secret = process.env.JWT_SECRET;
     return await this.jwt.signAsync(payload, { secret });
   }
 }

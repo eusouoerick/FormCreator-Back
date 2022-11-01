@@ -56,8 +56,12 @@ export class UserService {
           data['password'] = await argon.hash(dto.newPassword);
         }
         delete dto.newPassword;
-      } else if (dto[key]) {
-        data[key] = dto[key].split(' ').join(' ');
+      } else if (dto[key] || key === 'notify') {
+        if (key === 'name') {
+          data[key] = dto[key].split(' ').join(' ');
+        } else {
+          data[key] = dto[key];
+        }
       }
     }
 

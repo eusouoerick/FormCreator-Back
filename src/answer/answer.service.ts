@@ -3,14 +3,19 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { isAfter, isToday } from 'date-fns';
+import { EmailService } from 'src/email/email.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { QueryType } from 'src/types';
 import { AnswerDto, CheckAnswersDto } from './dto';
 
 @Injectable()
 export class AnswerService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+  ) {}
 
   async getAnswers(hash: string, userId: number, query: QueryType) {
     const form = await this.prisma.form.findFirst({
@@ -63,10 +68,11 @@ export class AnswerService {
     return form;
   }
 
-  async createAnswer(hash: string, dto: AnswerDto, userId: number) {
+  async createAnswer(hash: string, dto: AnswerDto, userReq: User) {
     const form = await this.prisma.form.findFirst({
       where: { hash },
       include: {
+        author: true,
         users_answers: {
           select: {
             createdBy: true,
@@ -86,7 +92,7 @@ export class AnswerService {
     }
 
     const checkUser = form.users_answers.some(
-      (item) => item.createdBy === userId,
+      (item) => item.createdBy === userReq.id,
     );
 
     if (checkUser) {
@@ -97,7 +103,7 @@ export class AnswerService {
 
     const { id: answerId } = await this.prisma.user_Answer.create({
       data: {
-        createdBy: userId,
+        createdBy: userReq.id,
         formId: form.id,
       },
     });
@@ -115,6 +121,14 @@ export class AnswerService {
       where: { id: form.id },
       data: { answers_length: { increment: 1 } },
     });
+
+    if (userReq.id !== form.createdBy && form.author.notify) {
+      await this.emailService.newAnswer({
+        from: userReq.name,
+        form: { title: form.title, hash: form.hash },
+        to: { name: form.author.name, email: form.author.email },
+      });
+    }
 
     return {
       formId: form.id,
