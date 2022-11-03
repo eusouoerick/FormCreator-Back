@@ -22,10 +22,6 @@ export class AuthService {
       where: {
         email: dto.email,
       },
-      select: {
-        id: true,
-        password: true,
-      },
     });
 
     if (!user) throw new NotFoundException('Invalid credentials');
@@ -33,8 +29,9 @@ export class AuthService {
     const hash = await argon.verify(user.password, dto.password);
     if (!hash) throw new ForbiddenException('Invalid credentials');
 
+    delete user.password;
     const token = await this.createToken(user.id);
-    return { token };
+    return { user, token };
   }
 
   async signup(dto: SignupDto) {
@@ -47,10 +44,10 @@ export class AuthService {
           password: hash,
         },
       });
-
+      delete user.password;
       const token = await this.createToken(user.id);
       await this.emailService.welcome({ email: user.email, name: user.name });
-      return { token };
+      return { user, token };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
