@@ -19,9 +19,7 @@ export class AuthService {
 
   async signin(dto: SigninDto) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
+      where: { email: dto.email },
     });
 
     if (!user) throw new NotFoundException('Invalid credentials');

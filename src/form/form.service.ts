@@ -31,6 +31,7 @@ export class FormService {
         data: {
           createdBy: userId,
           title: dto.title,
+          desc: dto.desc,
           date: date || null,
           average: dto.average || null,
         },

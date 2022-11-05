@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -31,12 +32,17 @@ export class UserService {
 
   async findUserAndUpdate(userId: number, dto: EditUserDto) {
     const checkUser = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
+      where: { id: userId },
     });
 
     if (!checkUser) throw new NotFoundException('User not found');
+
+    if (dto.email) {
+      const email = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+      if (email) throw new BadRequestException('Credentials taken');
+    }
 
     delete dto.image;
 
