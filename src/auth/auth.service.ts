@@ -62,7 +62,6 @@ export class AuthService {
     });
 
     if (!user) return;
-    console.log(user);
     const { id, name, email } = user;
     const token = await this.jwt.signAsync(
       { userId: id },

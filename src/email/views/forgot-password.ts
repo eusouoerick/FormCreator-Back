@@ -98,7 +98,7 @@ export const EmailForgotPassword = (name: string, token: string) => {
         </div>
         <a href="${
           process.env.CLIENT_URL + '/auth/change-password?token=' + token
-        }" class="btn">Change Password</a>
+        }" class="btn" style="color: #fff;">Change Password</a>
       </div>
     </body>
     </html>

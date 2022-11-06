@@ -19,6 +19,8 @@ import { EmailModule } from './email/email.module';
         REDIS_HOST: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
         CLIENT_URL: Joi.string(),
+        EMAIL_USER: Joi.string(),
+        EMAIL_PASS: Joi.string(),
       }),
     }),
     BullModule.forRootAsync({

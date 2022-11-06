@@ -13,7 +13,7 @@ export class EmailProcessor {
     try {
       await this.mailService.sendMail({
         to: data.email,
-        from: 'no@reply.com',
+        from: 'Form Creator <erick.formcreator@gmail.com>',
         subject: `🎉 Welcome to Form Creator`,
         text: 'Welcome to Form Creator! Create your forms in a simple and easy way',
         html: EmailWelcome(data.name),
@@ -29,7 +29,7 @@ export class EmailProcessor {
     try {
       await this.mailService.sendMail({
         to: data.to.email,
-        from: 'no@reply.com',
+        from: 'Form Creator <erick.formcreator@gmail.com>',
         subject: `Your form has a new answer`,
         text: `${data.from} replied to your form`,
         html: EmailNewAnswer(data),
@@ -51,12 +51,13 @@ export class EmailProcessor {
     try {
       await this.mailService.sendMail({
         to: data.email,
-        from: 'no@reply.com',
+        from: 'Form Creator <erick.formcreator@gmail.com>',
         subject: `Password reset request`,
         text: `We received a request to reset your account password`,
         html: EmailForgotPassword(data.name, data.token),
       });
     } catch (error) {
+      console.error(error);
       console.log('Failed to send email to:', data.email);
     }
     return {};

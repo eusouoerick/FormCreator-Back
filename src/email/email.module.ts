@@ -12,11 +12,15 @@ import { EmailService } from './email.service';
     }),
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.ethereal.email',
+        host: 'smtp.gmail.com',
         port: 587,
+        secure: false,
         auth: {
-          user: 'annetta.abshire47@ethereal.email',
-          pass: 'jKNCKDKvvzBRBtgUgh',
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+        tls: {
+          rejectUnauthorized: false,
         },
       },
     }),

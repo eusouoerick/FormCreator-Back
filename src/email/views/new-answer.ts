@@ -73,12 +73,13 @@ export const EmailNewAnswer = ({ from, to, form }: TypesNewAnswer) => {
           font-size: 14px;
           padding: 8px 10px;
           background: #632FF5;
-          color: #fff;
+          color: #ffffff;
           text-decoration: none;
           border-radius: 5px;
           box-shadow: 0px 3px 10px #b5b5b5;
         }
 
+        
         .title {
           font-size: 22px;
         }
@@ -135,7 +136,7 @@ export const EmailNewAnswer = ({ from, to, form }: TypesNewAnswer) => {
         </div>
         <a href="${
           process.env.CLIENT_URL + '/forms/' + form.hash + '/answers'
-        }" class="btn">
+        }" class="btn" style="color: #fff;">
           See answers
         </a>
         <div class="footer">

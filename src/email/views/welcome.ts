@@ -125,7 +125,7 @@ export const EmailWelcome = (name: string) => {
         <p style="font-size: 18px;">We're thrilled to see you here! 🎉</p>
         <a href="${
           process.env.CLIENT_URL + '/dashboard'
-        }" class="btn">Get Started Now</a>
+        }" class="btn" style="color: #fff;">Get Started Now</a>
       </div>
       <div class="content">
         <p class="title">Next steps:</p>
