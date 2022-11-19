@@ -1,6 +1,5 @@
 // prettier-ignore
-import { ForbiddenException, Injectable, NotFoundException, } from '@nestjs/common';
-import { BadRequestException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as argon from 'argon2';
